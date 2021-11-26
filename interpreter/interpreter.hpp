@@ -2,12 +2,21 @@
 #define INTERPRETER_HPP
 
 #include <iostream>
+#include <iomanip>
 #include <vector>
+#include <stack>
 #include <fstream>
 #include <string>
 #include <map>
 
 #include "../flags/flags.hpp"
+
+// Struct for commands
+struct Command {
+    char c;
+    int line;
+    int col;
+};
 
 class Interpreter {
 
@@ -28,36 +37,7 @@ private:
         {',', input},
         {'[', begin_loop},
         {']', end_loop},
-        {' ', next_col},
-        {'\n', next_line}
     };
-
-
-    /**
-     *  line:               For debugging. The current line the program is on.
-     */
-    int line = 1;
-
-    /**
-     *  column:             For debugging. The current column the program is on.
-     */
-    int column = 0;
-
-    /**
-     *  loop_begin:         The position in the file a loop begins.
-     */
-    std::streampos loop_begin_pointer;
-
-    std::streampos temp_pos;
-
-    int loop_begin_line;
-
-    int loop_begin_col;
-
-    /**
-     *  loop_end:           The position in the file a loop ends.
-     */
-    std::streampos loop_end_pointer;
 
     /**
      *  char_ptr:           The pointer to the current memory location.
@@ -82,9 +62,22 @@ private:
     /**
      *  char_array:         The array of characters to be used in the program.
      */
-    std::vector<unsigned char> char_array;
+    unsigned char char_array[30000] = {0};
 
     std::ifstream file;
+
+    /**
+     *  comm_array:         The sequential list of commands given from the file.
+     */
+    std::vector<struct Command> comm_array;
+
+    /**
+     *  comm_index:         The current index of the command array.
+     */
+    unsigned int comm_index = 0;
+
+    std::stack<int> loop_begin_indices;
+
     // Private methods
 
     /**
@@ -128,16 +121,24 @@ private:
 
     void next_col();
 
+    void print_debug(struct Command);
+
 public:
 
     Interpreter(Flags);
     // Public methods
 
     /**
-     * run():
-     *          Run the input program.
+     *  run():
+     *          Run the commands sequentially as given by comm_array.
      */
     void run();
+
+    /**
+     *  read_from_input():
+     *          Read the input file and load the commands into the comm_array.
+     */
+    void read_from_input();
 
 };
 

@@ -4,82 +4,139 @@ Interpreter::Interpreter(Flags flags) {
     this->debug_mode = flags.debug_mode;
     this->explicit_output = flags.explicit_output;
     this->filename = flags.filename;
-    this->char_array = std::vector<unsigned char>(30000, 0);
-    std::cout << filename << std::endl;
+    //this->char_array = std::vector<unsigned char>(30000, 0);
+
     this->file.open(filename);
-}
-
-void Interpreter::run() {
-    char current_char;
-    if(!this->file.eof() && this->file.good()) {
-        
-        while(this->file.get(current_char)) {
-            //std::cout << "curr char" << current_char << std::endl;
-
-            // Make sure character is functional command (ie not a comment)
-            if(this->command_map.find(current_char) != this->command_map.end()) {
-
-                // Print the current command if in debug mode
-                if(this->debug_mode && current_char != ' ' && current_char != '\n') {
-                    std::cout << this->filename << ":" << this->line << ":" << this->column << ": " << current_char << std::endl;
-                }
-
-                // Execute the command
-                (this->*(command_map[current_char]))();
-            }
-
-            // If it is not a functional command, it is a comment. The rest of the line is ignored
-            else{
-                std::string temp_line = "";
-                std::getline(file, temp_line);
-                //std::cout << "temp_line " << temp_line << std::endl;
-                this->line++;
-                this->column = 0;
-            }
-            this->temp_pos = file.tellg();
-            this->column++;
-        }
-    }
-
-    else {
-        std::cout << "Unable to find file " << this->filename << "." << std::endl;
+    if(!this->file.good()) {
+        std::cerr << "Unable to find file " << this->filename << std::endl;
         exit(1);
     }
 
-    file.close();
+    for(int i = 0; i < 10; i++){
+        std::cout << (int)this->char_array[i] << std::endl;
+    }
 }
 
-void Interpreter::begin_loop() {
+void Interpreter::read_from_input() {
+    char current_char;
+    int line = 1;
+    int column = 1;
 
+    while(this->file.get(current_char)) {
+        
+        if(this->command_map.find(current_char) != this->command_map.end()) {
+            struct Command new_command;
+            new_command.c = current_char;
+            new_command.line = line;
+            new_command.col = column;
+            this->comm_array.push_back(new_command);
+            column++;
+        }
 
-    //this->file.seekg(-1, std::ios::cur);
-    this->loop_begin_pointer = this->temp_pos;
-    //std::cout << "loop begin" << this->loop_begin_pointer << std::endl;
-    this->loop_begin_line = this->line;
-    this->loop_begin_col = this->column;
+        else if (current_char == ' ') {
+            column++;
+        }
 
+        else if (current_char == '\n') {
+            line++;
+            column = 1;
+        }
+
+        // If it is not a functional command, it is a comment. The rest of the line is ignored
+        else{
+            std::string temp_line = "";
+            std::getline(file, temp_line);
+            //std::cout << "temp_line " << temp_line << std::endl;
+            line++;
+            column = 1;
+        }
+    }
+    file.close();
     this->run();
 }
 
-void Interpreter::end_loop() {
-    if(this->char_array[this->char_ptr] == 0) {
-        this->loop_begin_pointer = -1;
+
+void Interpreter::run() {
+
+    while(this->comm_index < this->comm_array.size()) {
+        struct Command curr_command = this->comm_array[this->comm_index];
+
+        if(this->debug_mode) {
+            print_debug(curr_command);
+        }
+
+        (this->*(command_map[curr_command.c]))();
+
+        this->comm_index++;
+    }
+    
+}
+
+void Interpreter::print_debug(struct Command command) {
+
+    // Display current command info
+    std::cout << this->filename << ":" << command.line << ":" << command.col << ": " << command.c << "\n" << std::endl;
+    // Print the pointer positions around the current one
+    /*
+    std::cout << std::setw(5);
+    if(this->char_ptr-2 >= 0){
+        std::cout << "...";
+    }
+    if(this->char_ptr-1 >= 0){
+        std::cout << this->char_ptr-1;
     }
 
-    if(this->loop_begin_pointer > -1){
-        this->loop_end_pointer = this->file.tellg();
-        this->file.seekg(this->loop_begin_pointer, std::ios::beg);
-        //this->file.seekg(-2, std::ios::cur);
-        this->line = this->loop_begin_line;
-        this->column = this->loop_begin_col;
+    std::cout << this->char_ptr;
+
+    if(this->char_ptr+1 < 30000){
+        std::cout << this->char_ptr+1;
+    }
+    if(this->char_ptr+2 < 30000){
+        std::cout << "...";
+    }
+    std::cout << std::endl;
+    */
+
+    // Print the cell contents at each location
+    if(this->char_ptr-2 >= 0){
+        std::cout << "...";
+    }
+    if(this->char_ptr-1 >= 0){
+        std::cout << "|" << (int)this->char_array[char_ptr-1] << "|";
+    }
+
+    std::cout << "|" << (int)this->char_array[char_ptr] << "|";
+
+    if(this->char_ptr+1 < 30000){
+        std::cout << "|" << (int)this->char_array[char_ptr+1] << "|";
+    }
+    if(this->char_ptr+2 < 30000){
+        std::cout << "...";
+    }
+    std::cout << "\n" << std::endl;
+   // std::cout << std::setw(0);
+
+}
+
+void Interpreter::begin_loop() {
+    this->loop_begin_indices.push(this->comm_index+1);
+}
+
+void Interpreter::end_loop() {
+    if(this->char_array[this->char_ptr] == 0){
+        this->comm_index = this->loop_begin_indices.top();
+    }
+    else if(this->loop_begin_indices.size() == 0){
+        std::cout << "Invalid syntax" << std::endl;
     }
     else{
-        this->loop_end_pointer = -1;
+        this->loop_begin_indices.pop();
     }
 }
 
 void Interpreter::increment_cell() {
-    // If the cell value is already 0, return
+
+    // If the cell value is already 255, return
     if(this->char_array[this->char_ptr] == 255){
         if(this->debug_mode) {
             std::cout << "Tried to increment cell " << this->char_ptr << " with value 255; cell value unchanged." << std::endl;
@@ -160,13 +217,4 @@ void Interpreter::input() {
         std::cout << "User input " << input << " into cell " << this->char_ptr << "." << std::endl;
     }
     this->char_array[this->char_ptr] = input;
-}
-
-void Interpreter::next_line() {
-    this->line++;
-    this->column = 0;
-}
-
-void Interpreter::next_col() {
-    this->column++;
 }
