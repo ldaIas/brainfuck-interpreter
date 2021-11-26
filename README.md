@@ -171,6 +171,7 @@ Basically everything listed in the Flags section:
 ## Contributing
 
 This project is open to contributers. Specifically, anyone willing to add additional information or clean debugging messages would be appreciated. 
+Help with creating a much more well-rounded ```Makefile``` would also be appreciated.
 If you have any ideas or have implemented a new feature, just issue a PR and it will be reviewed.
 
 ## Licensing
