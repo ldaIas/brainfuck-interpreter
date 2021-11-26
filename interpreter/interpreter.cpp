@@ -19,7 +19,6 @@ Interpreter::Interpreter(Flags flags) {
     this->debug_mode = flags.debug_mode;
     this->explicit_output = flags.explicit_output;
     this->filename = flags.filename;
-    //this->char_array = std::vector<unsigned char>(30000, 0);
 
     this->file.open(filename);
     if(!this->file.good()) {
