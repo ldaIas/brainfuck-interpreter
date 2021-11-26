@@ -72,7 +72,7 @@ terminate the program with an exit code of 1.
 ###### Syntax Error
 
 There is not a lot of syntax in BF, so these error are rare. The only time a syntax error can occur is if one uses an end loop character "]" before
-starting a loop with "[". A syntax error will terminate the program with an exit code of 1.
+starting a loop with "[", or if a loop is started but never ended. A syntax error will terminate the program with an exit code of 1.
 
 ##### NOTE:
 
