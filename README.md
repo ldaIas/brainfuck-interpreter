@@ -30,7 +30,7 @@ To run a BF file, type the following into a command line after compiling:
 ```bfi.exe [filename]```
 ##### Unix:
 
-```bfi [filename]````
+```bfi [filename]```
 
 Replacing [filename] with the name of the file you want to run.
 
