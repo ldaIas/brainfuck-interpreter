@@ -154,8 +154,6 @@ void Interpreter::increment_cell() {
 }
 
 void Interpreter::decrement_cell() {
-
-    std::cout << "decrement called" << std::endl;
     // If the cell value is already 0, return
     if(this->char_array[this->char_ptr] == 0){
         std::cerr << "Value Error: Tried to decrement cell " << this->char_ptr << " with value 0.\n"
@@ -196,7 +194,7 @@ void Interpreter::output() {
     if(this->explicit_output) {
         std::cout << (int)this->char_array[this->char_ptr] << std::endl;
     }
-    std::cout << (unsigned char)this->char_array[this->char_ptr] << std::endl;
+    std::cout << (unsigned char)this->char_array[this->char_ptr];
 }
 
 void Interpreter::input() {
