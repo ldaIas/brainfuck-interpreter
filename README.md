@@ -27,12 +27,12 @@ To run a BF file, type the following into a command line after compiling:
 
 ##### Windows:
 
-```bfi.exe [filename]```
+```bfi.exe [-options] [filename]```
 ##### Unix:
 
-```bfi [filename]```
+```bfi [-options] [filename]```
 
-Replacing [filename] with the name of the file you want to run.
+Replacing ```[filename]``` with the name of the file you want to run.
 
 #### Command Line Flags/Options
 
@@ -44,7 +44,7 @@ This BF Interpreter currently supports 3 options/flags for use while running BF 
 This option should be used for debugging, without the extra information that comes with the next flag.
 
 ```-d --debug```: This flag will display information about the current pointer, its cell value, and adjacent cell values, whenever an operation is performed.
-It also displays the line of the current operation in the file running as [filename]:[line]:[column]
+It also displays the line of the current operation in the file running as ```[filename]:[line]:[column]```
 Example debug output:
 
 ```
