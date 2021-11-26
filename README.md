@@ -158,6 +158,10 @@ Pointer :   ^
 - Currently, the debugging information can be a bit hard for new users to this interpreter to make sense of. Adding breakpoints in BF code and another flag for use of
 breakpoints is a feature that is planned to be implemented.
 
+- Infinite loop checking.
+
+- Pre-run syntax checking.
+
 - More features may be thought of as they arise.
 
 ## Current Features
