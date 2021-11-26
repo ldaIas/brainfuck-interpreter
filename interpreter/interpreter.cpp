@@ -79,6 +79,14 @@ void Interpreter::run() {
 
         this->comm_index++;
     }
+
+    // If a loop was started but never ended, throw a syntax error
+    if(this->loop_begin_indices.size() != 0){
+        struct Command command = this->comm_array[this->loop_begin_indices.top()];
+        std::cerr << "\nInvalid syntax: '[' with no terminating ']': \n" << 
+        this->filename << ":" << command.line << ":" << command.col << ": " << command.c <<  std::endl;
+        exit(1);
+    }
     
 }
 
@@ -120,18 +128,18 @@ void Interpreter::begin_loop() {
 
 void Interpreter::end_loop() {
 
+    // If there is no beginning of this loop, there is invalid syntax
+    // I.e ']' came before '['
+    if(this->loop_begin_indices.size() == 0){
+        struct Command command = this->comm_array[this->comm_index];
+        std::cerr << "\nInvalid syntax: ']' called before starting '[': \n" << 
+        this->filename << ":" << command.line << ":" << command.col << ": " << command.c <<  std::endl;
+        exit(1);
+    }
+
     // If the pointer value is not 0, return to the beginning of the loop
     if(this->char_array[this->char_ptr] != 0){
         this->comm_index = this->loop_begin_indices.top();
-    }
-
-    // If there is no beginning of this loop, there is invalid syntax
-    // I.e ']' came before '['
-    else if(this->loop_begin_indices.size() == 0){
-        struct Command command = this->comm_array[this->comm_index];
-        std::cerr << "Invalid syntax: ']' called before starting '[': \n" << 
-        this->filename << ":" << command.line << ":" << command.col << ": " << command.c <<  std::endl;
-        exit(1);
     }
 
     // If the value is 0, end the loop and pop from loop stack
