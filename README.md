@@ -79,16 +79,26 @@ BF code itself is rather simple, but requires a good bit of thinking, since it i
 This section will lay out all valid BF operations.
 
 ```+```: Adds 1 to the cell value the current pointer is at.
+
 ```-```: Subtracts 1 from the cell value the current pointer is at.
+
 ```>```: Adds 1 to the pointer (I.E. move pointer from cell 1 to cell 2).
+
 ```<```: Subtracts 1 from the pointer (I.E. move pointer from cell 2 to cell 1).
+
 ```.```: Output the value in the current pointer's cell.
+
 ```,```: Input a value to the current pointer's cell. NOTE: This will overwrite any value already stored in this pointer's cell.
+
 Additionally, user input above 255 will be truncated to the first digit (I.E. input of 342 is truncated to 3). Currently, there is no
 check for a value under 0.
 
 ```[```: Denotes the beginning of a loop.
+
 ```]```: Denotes the end of a loop. Loops will only exit when the current pointer's cell value is 0. As of right now, there is no check for infinite loops.
+
+To comment, simply type your comment where you would like. Any character that is not one of the eight above will be ignored along with the rest of the line.
+This is shown in the below example.
 
 #### Example Program
 
