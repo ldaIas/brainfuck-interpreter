@@ -81,47 +81,72 @@ private:
     // Private methods
 
     /**
-     *  Decrement the cell.
+     *  decrement_cell():
+     *          Decrement the cell the current pointer points to.
      */
     void decrement_cell();
     
     /**
-     *  Increment the cell.
+     *  increment_cell():
+     *          Increment the cell the current pointer points to.
      */
     void increment_cell();
 
     /**
-     *  Decrement the pointer.
+     *  decrement_ptr(): 
+     *          Decrement the current pointer.
      */
     void decrement_ptr();
     
     /**
-     *  Increment the pointer.
+     *  increment_ptr(): 
+     *          Increment the current pointer.
      */
     void increment_ptr();
 
     /**
-     *  Output the current cell.
+     *  output():
+     *          Output the ASCII value of the cell the current pointer is at.
      */
     void output();
 
     /**
-     *  Get input for the current cell. Truncates inputs larger than 1 byte to the first number.
+     *  input(): 
+     *          Get input for the current cell. Truncates inputs larger than 1 byte to the first digit.
      */
     void input();
 
     /**
-     *  Increment tracking variables for a new line.
+     *  next_line(): 
+     *          Increment member variable line (used for debugging and tracking).
      */
     void next_line();
 
+    /**
+     *  begin_loop():
+     *          Sets the position for the beginning of a loop.
+     */
     void begin_loop();
 
+    /**
+     *  end_loop():
+     *          Processes the end of a loop decleration.
+     *          Has logic for end loop condition, invalid syntax,
+     *          and returning to the start of the loop.
+     */
     void end_loop();
 
+    /**
+     *  next_col():
+     *          Increment the member variable column (used for debugging and tracking).
+     */
     void next_col();
 
-    void print_debug(struct Command);
+    /**
+     *  print_debug():
+     *          Prints current pointer information, along with the 2 adjacent pointers.
+     */
+    void print_debug();
 
 public:
 

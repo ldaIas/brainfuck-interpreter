@@ -11,10 +11,6 @@ Interpreter::Interpreter(Flags flags) {
         std::cerr << "Unable to find file " << this->filename << std::endl;
         exit(1);
     }
-
-    for(int i = 0; i < 10; i++){
-        std::cout << (int)this->char_array[i] << std::endl;
-    }
 }
 
 void Interpreter::read_from_input() {
@@ -60,75 +56,70 @@ void Interpreter::run() {
 
     while(this->comm_index < this->comm_array.size()) {
         struct Command curr_command = this->comm_array[this->comm_index];
+        (this->*(command_map[curr_command.c]))();
 
         if(this->debug_mode) {
-            print_debug(curr_command);
+            print_debug();
         }
-
-        (this->*(command_map[curr_command.c]))();
 
         this->comm_index++;
     }
     
 }
 
-void Interpreter::print_debug(struct Command command) {
+void Interpreter::print_debug() {
+
+    struct Command command = this->comm_array[this->comm_index];
+
+    // If command is an output, don't print cells.
+    // This is because the cell values will not have changed and the display is more clear.
+    if(command.c == '.') return;
 
     // Display current command info
     std::cout << this->filename << ":" << command.line << ":" << command.col << ": " << command.c << "\n" << std::endl;
-    // Print the pointer positions around the current one
-    /*
-    std::cout << std::setw(5);
+    
+    // Display cell information around the current pointer as integers.
     if(this->char_ptr-2 >= 0){
-        std::cout << "...";
-    }
-    if(this->char_ptr-1 >= 0){
-        std::cout << this->char_ptr-1;
+        std::cout << "|...|\t" << "..." << std::endl;
     }
 
-    std::cout << this->char_ptr;
-
-    if(this->char_ptr+1 < 30000){
-        std::cout << this->char_ptr+1;
+    if(this->char_ptr-1 >= 0) {
+        std::cout << "|" << std::setw(3) << (int)this->char_array[char_ptr-1] << "|\t" << std::setw(0) << this->char_ptr-1 << std::endl;
     }
+
+    std::cout << "|" << std::setw(3) << (int)this->char_array[char_ptr] << "|\t" << std::setw(0) << this->char_ptr << "\t<-" << std::endl;
+
+    if(this->char_ptr+1 < 30000) {
+        std::cout << "|" << std::setw(3) << (int)this->char_array[char_ptr+1] << "|\t" << std::setw(0) << this->char_ptr+1 << std::endl;
+    }
+
     if(this->char_ptr+2 < 30000){
-        std::cout << "...";
+        std::cout << "|...|\t" << "...\n" << std::endl;
     }
-    std::cout << std::endl;
-    */
-
-    // Print the cell contents at each location
-    if(this->char_ptr-2 >= 0){
-        std::cout << "...";
-    }
-    if(this->char_ptr-1 >= 0){
-        std::cout << "|" << (int)this->char_array[char_ptr-1] << "|";
-    }
-
-    std::cout << "|" << (int)this->char_array[char_ptr] << "|";
-
-    if(this->char_ptr+1 < 30000){
-        std::cout << "|" << (int)this->char_array[char_ptr+1] << "|";
-    }
-    if(this->char_ptr+2 < 30000){
-        std::cout << "...";
-    }
-    std::cout << "\n" << std::endl;
-   // std::cout << std::setw(0);
 
 }
 
 void Interpreter::begin_loop() {
-    this->loop_begin_indices.push(this->comm_index+1);
+    this->loop_begin_indices.push(this->comm_index);
 }
 
 void Interpreter::end_loop() {
-    if(this->char_array[this->char_ptr] == 0){
+
+    // If the pointer value is not 0, return to the beginning of the loop
+    if(this->char_array[this->char_ptr] != 0){
         this->comm_index = this->loop_begin_indices.top();
     }
+
+    // If there is no beginning of this loop, there is invalid syntax
+    // I.e ']' came before '['
     else if(this->loop_begin_indices.size() == 0){
-        std::cout << "Invalid syntax" << std::endl;
+        struct Command command = this->comm_array[this->comm_index];
+        std::cerr << "Invalid syntax: ']' called before starting '[': \n" << 
+        this->filename << ":" << command.line << ":" << command.col << ": " << command.c <<  std::endl;
+        exit(1);
     }
+
+    // If the value is 0, end the loop and pop from loop stack
     else{
         this->loop_begin_indices.pop();
     }
@@ -138,26 +129,24 @@ void Interpreter::increment_cell() {
 
     // If the cell value is already 255, return
     if(this->char_array[this->char_ptr] == 255){
-        if(this->debug_mode) {
-            std::cout << "Tried to increment cell " << this->char_ptr << " with value 255; cell value unchanged." << std::endl;
-        }
-        return;
+        std::cerr << "Value Error: Tried to increment cell " << this->char_ptr << " with value 255.\n"
+        << "See -h --help for information on cell values." << std::endl;
+        
+        exit(1);
     }
 
     this->char_array[this->char_ptr]++;
-    if(this->debug_mode) {
-        std::cout << "Incremented cell " << this->char_ptr << "; new value: " << (int)this->char_array[this->char_ptr] << std::endl;
-    }
 }
 
 void Interpreter::decrement_cell() {
 
+    std::cout << "decrement called" << std::endl;
     // If the cell value is already 0, return
     if(this->char_array[this->char_ptr] == 0){
-        if(this->debug_mode) {
-            std::cout << "Tried to decrement cell " << this->char_ptr << " with value 0; cell value unchanged." << std::endl;
-        }
-        return;
+        std::cerr << "Value Error: Tried to decrement cell " << this->char_ptr << " with value 0.\n"
+        << "See -h --help for information on cell values." << std::endl;
+        
+        exit(1);
     }
 
     this->char_array[this->char_ptr]--;
@@ -168,31 +157,26 @@ void Interpreter::decrement_cell() {
 
 void Interpreter::increment_ptr() {
     if(this->char_ptr == 29999) {
-        std::cout << "error: pointer exceeded memory bounds. Aborted." << std::endl;
+        std::cerr << "Out of Bounds exception: Pointer exceeded memory bounds (>30000). Aborted." << std::endl;
         exit(1);
     }
 
     this->char_ptr++;
-    if(this->debug_mode) {
-        std::cout << "Pointer incremented to " << this->char_ptr << std::endl;
-    }
 }
 
 void Interpreter::decrement_ptr() {
     if(this->char_ptr == 0) {
-        std::cout << "error: pointer exceeded memory bounds. Aborted." << std::endl;
+        std::cerr << "Out of Bounds exception: Pointer exceeded memory bounds (<0). Aborted." << std::endl;
         exit(1);
     }
 
     this->char_ptr--;
-    if(this->debug_mode) {
-        std::cout << "Pointer decremented to " << this->char_ptr << std::endl;
-    }
 }
 
 void Interpreter::output() {
     if(this->debug_mode) {
-        std::cout << (int)this->char_array[this->char_ptr] << " @ [" << this->char_ptr << "]" << std::endl;
+        std::cout << (int)this->char_array[this->char_ptr] << " @ [" << this->char_ptr << "]\n" 
+        "OUTPUT:" << std::endl;
     }
     if(this->explicit_output) {
         std::cout << (int)this->char_array[this->char_ptr] << std::endl;

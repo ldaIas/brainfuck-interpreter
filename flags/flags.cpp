@@ -4,6 +4,9 @@
 
 void print_usage() {
     std::cout <<
+        "\nThe Brainfuck Interpreter!\n"
+        "You have access to 30,000 memory locations, and each location is bound from\n"
+        "0 to 255, as they are meant to represent ASCII characters.\n"
         "\nUsage: bfi [options] filename\n"
         "\n"
         "Options\n"
@@ -14,7 +17,11 @@ void print_usage() {
         "       Print both the number and the character whenever output (.) is called.\n"
         "\n"
         "   -d, --debug:\n"
-        "       Run in debug mode, printing information about the pointer every operation.\n";
+        "       Run in debug mode, printing information about the pointer every operation.\n"
+        "       Displayed in the following manner:\n"
+        "       |[integral cell value]|\t[pointer]\t[<-]\n"
+        "       Displayed for the the cell before the current pointer, the current pointer,\n"
+        "       and the cell after the current pointer, if available.\n";
 }
 
 
