@@ -55,7 +55,7 @@ Example debug output:
 |  0| 11
 |...| ...
 ```
-The cell's value is denoted by ```|```, and the pointer is denoted by the number next to the cell. The ```<-``` denotes the where the program's current pointer is.
+The cell's value is denoted by ```|```, and the pointer is denoted by the number next to the cell. The ```<-``` denotes where the program's current pointer is.
 
 #### Errors/Exceptions
 
