@@ -94,8 +94,8 @@ This section will lay out all valid BF operations.
 
 ```,```: Input a value to the current pointer's cell. NOTE: This will overwrite any value already stored in this pointer's cell.
 
-Additionally, user input above 255 will be truncated to the first digit (I.E. input of 342 is truncated to 3). Currently, there is no
-check for a value under 0.
+Additionally, user input above 255 will be truncated to the first digit (I.E. input of 342 is truncated to 3). If input is below 0, it will
+go in as 0.
 
 ```[```: Denotes the beginning of a loop.
 
