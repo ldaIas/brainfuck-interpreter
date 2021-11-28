@@ -217,6 +217,9 @@ void Interpreter::input() {
         this->char_array[this->char_ptr] = input;
         return;        
     }
+    if(input < 0) {
+        input = 0;
+    }
     if(this->debug_mode) {
         std::cout << "User input " << input << " into cell " << this->char_ptr << "." << std::endl;
     }
